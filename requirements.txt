@@ -1,0 +1,11 @@
+aiohttp==2.2.5
+async-timeout==2.0.0
+chardet==3.0.4
+feedparser==5.2.1
+future==0.16.0
+multidict==3.2.0
+pkg-resources==0.0.0
+python-telegram-bot==8.1.1
+python2==1.2
+telepot==12.3
+yarl==0.13.0
