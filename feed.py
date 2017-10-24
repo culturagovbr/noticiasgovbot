@@ -2,9 +2,10 @@ import telepot
 import sqlite3
 import feedparser
 import time
+from bs4 import BeautifulSoup
 from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
-import logging
+from urllib.request import urlopen
 
 def on_chat_message(msg):
     while 1:
@@ -30,14 +31,45 @@ def on_chat_message(msg):
             result = curs.fetchone()
 
             if (post['bozo'] == 1):
-                print('Feed com problemas: '+ link[0])
-                # caso o link forneca download
-                # url= y
-                # urllib.urlretrieve(url, "RSS.txt")
-                # o = urllib2.urlopen(url)
-                # arq = o.read()
-                # with open("RSS2.tpostt")
-                pass
+                url = (link[0])
+                read = urlopen(url)
+                soup = BeautifulSoup(read,'html.parser')
+                #Remover tags titles e guid
+                titles = soup.find('title').find_all(text=True)
+                links = soup.find('guid').find_all(text=True)
+                AFC = 1
+                if(result):              
+                    cont = 0
+                    while (rodar):
+                        for i in range(len(titles)):    
+                            if(result[0] == titles[i]):    
+                                for linkP in links:
+                                    print(titles[AFC])
+                                    print(linkP)
+                                    bot.sendMessage(chat_id,''+titles[AFC]+'\n'+linkP)
+                                    AFC+=1
+                             
+                                sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
+                                curs = conn.cursor()
+                                params = (links[0],link[0])
+                                curs.execute(sql,params)
+                                conn.commit()
+                                
+                                #botar para enviar a mensagem e salvar ultimo titulo no banco
+                                rodar=0
+                                break
+                            else:
+                                cont+=1
+                else:
+                    print('nao existe')
+                    sql = 'INSERT INTO feedero VALUES (?,?)'
+                    curs = conn.cursor()
+                    params = (links[0],link[0])
+                    result = curs.execute(sql,params)
+                    for z in range(len(titles)):
+                        bot.sendMessage(chat_id,titles[z]+' \n '+links[z])
+                    conn.commit()
+                          
             else:
                 if(result):
                     cont = 0
@@ -72,14 +104,13 @@ def on_chat_message(msg):
         # code sleeps for 4 minutes
         time.sleep(240)
 
-TOKEN = 'TOKEN'  # get token from command-line
+TOKEN = '420896204:AAEVJamoLZA-LFfyRb3dh9dLRZWujQv8vbY'  # get token from command-line
 
 bot = telepot.Bot(TOKEN)
 
 MessageLoop(bot, {'chat': on_chat_message}).run_as_thread()
 
 print('Listening ...')
-# bot.sendMessage(chat_id, 'Serviço atualizado!/n Favor confirmar continuação de serviço: /start')
 
 while 1:
     time.sleep(10)
