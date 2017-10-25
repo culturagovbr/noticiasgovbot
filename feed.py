@@ -32,7 +32,7 @@ def on_chat_message(msg):
 
             if (post['bozo'] == 1):
                 url = (link[0])
-                read = urlopen(url)
+                read = urlopen((url),)
                 soup = BeautifulSoup(read,'html.parser')
                 #Remover tags titles e guid
                 titles = soup.find('title').find_all(text=True)
@@ -55,7 +55,6 @@ def on_chat_message(msg):
                                 curs.execute(sql,params)
                                 conn.commit()
                                 
-                                #botar para enviar a mensagem e salvar ultimo titulo no banco
                                 rodar = 0
                             break
                         else:
