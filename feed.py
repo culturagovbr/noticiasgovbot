@@ -37,18 +37,18 @@ def on_chat_message(msg):
                 #Remover tags titles e guid
                 titles = soup.find('title').find_all(text=True)
                 links = soup.find('guid').find_all(text=True)
-                AFC = 1
-                if(result):              
+                #print(links)
+                if(result):
                     cont = 0
                     while (rodar):
-                        for i in range(len(titles)):    
-                            if(result[0] == titles[i]):    
-                                for linkP in links:
-                                    print(titles[AFC])
-                                    print(linkP)
-                                    bot.sendMessage(chat_id,''+titles[AFC]+'\n'+linkP)
-                                    AFC+=1
-                             
+                        for i in range (len(links[0])):  
+                            if(result[0] != (links[0])):
+                                for z in range(cont):
+                                    print(titles[z])
+                                    print(z)
+                                    print('entrou no if com o bozo')    
+            #                        bot.sendMessage(chat_id,''+titles[AFC]+'\n'+links[0])
+                                    
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
                                 params = (links[0],link[0])
@@ -56,20 +56,21 @@ def on_chat_message(msg):
                                 conn.commit()
                                 
                                 #botar para enviar a mensagem e salvar ultimo titulo no banco
-                                rodar=0
-                                break
-                            else:
-                                cont+=1
+                                rodar = 0
+                            break
+                        else:
+                            cont+=1
+                            print(cont)
                 else:
                     print('nao existe')
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
                     params = (links[0],link[0])
                     result = curs.execute(sql,params)
-                    for z in range(len(titles)):
-                        bot.sendMessage(chat_id,titles[z]+' \n '+links[z])
-                    conn.commit()
-                          
+                    for z in range(len(links[0])):
+                        print('entrou no else com o bozo')    
+                    #    bot.sendMessage(chat_id,titles[z]+' \n '+links[z])
+                    conn.commit()            
             else:
                 if(result):
                     cont = 0
@@ -77,8 +78,8 @@ def on_chat_message(msg):
                         for i in range(len(post['entries'])):
                             if (result[0] == (post['entries'][i]['id'])):
                                 for z in range(cont):
-                    
-                                    bot.sendMessage(chat_id,post['entries'][z]['title']+' \n '+post['entries'][z]['id'])
+                                  print('entrou no if sem o bozo')  
+                                #    bot.sendMessage(chat_id,post['entries'][z]['title']+' \n '+post['entries'][z]['id'])
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
                                 params = (post['entries'][0]['id'],link[0])
@@ -96,7 +97,8 @@ def on_chat_message(msg):
                     params = (post['entries'][0]['id'],link[0])
                     result = curs.execute(sql,params)
                     for z in range(len(post['entries'])):
-                        bot.sendMessage(chat_id,post['entries'][z]['title']+' \n '+post['entries'][z]['id'])
+                     #   bot.sendMessage(chat_id,post['entries'][z]['title']+' \n '+post['entries'][z]['id'])
+                        print('entrou no else sem o bozo')    
                     conn.commit()
             link = (read.readline(),)
         read.close()
