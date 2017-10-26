@@ -31,19 +31,27 @@ def on_chat_message(msg):
             result = curs.fetchone()
 
             if (post['bozo'] == 1):
+                print('com bozo')
                 url = (link[0])
                 read = urlopen((url),)
                 soup = BeautifulSoup(read,'html.parser')
                 #Remover tags titles e guid
                 titles = soup.find('title').find_all(text=True)
-                links = soup.find('guid').find_all(text=True)
+                # links = soup.find('guid').find_all(text=True)
+                links = soup.find_all('guid',text=True)
                 #print(links)
                 if(result):
                     cont = 0
                     while (rodar):
-                        for i in range (len(links[0])):  
-                            if(result[0] != (links[0])):
+                        print(links[0])
+                        print(links[1])
+                        print(len(links))
+                        for i in range(len(links)):
+                            print('entrou1')
+                            if(result[0] == (links[i])):
+                                print('entrou2')
                                 for z in range(cont):
+                                    print('entrou3')
                                     print(titles[z])
                                     print(z)
                                     print('entrou no if com o bozo')    
@@ -56,10 +64,10 @@ def on_chat_message(msg):
                                 conn.commit()
                                 
                                 rodar = 0
-                            break
-                        else:
-                            cont+=1
-                            print(cont)
+                                break
+                            else:
+                                cont+=1
+                                print(cont)
                 else:
                     print('nao existe')
                     sql = 'INSERT INTO feedero VALUES (?,?)'
@@ -71,6 +79,7 @@ def on_chat_message(msg):
                     #    bot.sendMessage(chat_id,titles[z]+' \n '+links[z])
                     conn.commit()            
             else:
+                print('sem bozo')
                 if(result):
                     cont = 0
                     while (rodar):
@@ -105,7 +114,7 @@ def on_chat_message(msg):
         # code sleeps for 4 minutes
         time.sleep(240)
 
-TOKEN = '420896204:AAEVJamoLZA-LFfyRb3dh9dLRZWujQv8vbY'  # get token from command-line
+TOKEN = 'TOKEN'  # get token from command-line
 
 bot = telepot.Bot(TOKEN)
 
