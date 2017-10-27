@@ -119,7 +119,7 @@ def on_chat_message(msg):
         # code sleeps for 4 minutes
         time.sleep(240)
 
-TOKEN = '420896204:AAEVJamoLZA-LFfyRb3dh9dLRZWujQv8vbY'  # get token from command-line
+TOKEN = 'TOKEN'  # get token from command-line
 
 bot = telepot.Bot(TOKEN)
 
