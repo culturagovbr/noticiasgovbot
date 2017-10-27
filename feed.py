@@ -32,10 +32,10 @@ def on_chat_message(msg):
 
             if (post['bozo'] == 1):
                 print('com bozo')
-
+                debuga = 1
                 url = (link[0])
-                read = (urlopen(url),)
-                soup = BeautifulSoup(read,'html.parser')
+                ler = urlopen(url)
+                soup = BeautifulSoup(ler,'html.parser')
                 #Remover tags titles e guid
                 titles = soup.find_all('title')
                 type(titles)
@@ -43,33 +43,31 @@ def on_chat_message(msg):
                 #links
                 links = soup.find_all('guid')
                 type(links)
-
+                
                 if(result):
                     cont = 0
-                    while (rodar):
-                        #atribui o guid(links da pagina) para a variavel i
-                        for i in links:
-                            #i.text compara os links que estao no banco
-                            if(result[0] == i.text):
-                                print('entrou2')
-                                #atribui os titles(titulos da pagina)para a variavel z
-                                for z in titles:
-                                    print('entrou3')
-                                    print(z.text)
-                           #         print('entrou no if com o bozo')    
-            #                        bot.sendMessage(chat_id,''+titles[AFC]+'\n'+links[0])
-                                    
-                                sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
-                                curs = conn.cursor()
-                                params = (i.text,link[0])
-                                curs.execute(sql,params)
-                                conn.commit()
-                                
-                                rodar = 0
-                                print(rodar)
-                                break
-                            else:
-                                cont+=1
+                    #atribui o guid(links da pagina) para a variavel i
+                    for i in links:
+                        #i.text compara os links que estao no banco
+                        if(result[0] == i.text):
+                            #atribui os titles(titulos da pagina)para a variavel z
+                            for z in range(cont):
+                                if(titles[z].text == 'Fundação Cultural Palmares'):
+                                    z+=1
+                                    # print(titles[z].text)
+                                    # print(''+titles[z].text+'\n'+links[0].text)    
+                                    bot.sendMessage(chat_id,''+titles[z].text+'\n'+links[0].text)
+                                else:
+                                    bot.sendMessage(chat_id,''+titles[z].text+'\n'+links[0].text)
+                                        
+                            sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
+                            curs = conn.cursor()
+                            params = (i.text,link[0])
+                            curs.execute(sql,params)
+                            conn.commit()
+                            break
+                        else:
+                            cont+=1
                 else:
                     print('nao existe')
                     sql = 'INSERT INTO feedero VALUES (?,?)'
@@ -77,19 +75,23 @@ def on_chat_message(msg):
                     params = (links[0].text,link[0])
                     result = curs.execute(sql,params)
                     for z in range(len(links[0])):
-                        print('entrou no else com o bozo')    
-                    #    bot.sendMessage(chat_id,titles[z]+' \n '+links[z])
-                    conn.commit()            
+                        if(titles[z].text == 'Fundação Cultural Palmares'):
+                            z+=1
+                            # print(titles[z].text)
+                            # print(''+titles[z].text+'\n'+links[0].text)    
+                            bot.sendMessage(chat_id,''+titles[z].text+'\n'+links[0].text)
+                        else:
+                            bot.sendMessage(chat_id,''+titles[z].text+'\n'+links[0].text)                        
+                            
+                    conn.commit()                       
             else:
-                print('sem bozo')
                 if(result):
                     cont = 0
                     while (rodar):
                         for i in range(len(post['entries'])):
                             if (result[0] == (post['entries'][i]['id'])):
                                 for z in range(cont):
-                                  print('entrou no if sem o bozo')  
-                                #    bot.sendMessage(chat_id,post['entries'][z]['title']+' \n '+post['entries'][z]['id'])
+                                    bot.sendMessage(chat_id,post['entries'][z]['title']+'---'+link[0])
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
                                 params = (post['entries'][0]['id'],link[0])
@@ -99,24 +101,25 @@ def on_chat_message(msg):
                                 rodar = 0
                                 break
                             else:
-                                cont+=1                            
+                                cont+=1
+                                print(cont)                            
                 else:
-                    print('nao existe')
+                    print('não existe')
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
                     params = (post['entries'][0]['id'],link[0])
                     result = curs.execute(sql,params)
                     for z in range(len(post['entries'])):
-                     #   bot.sendMessage(chat_id,post['entries'][z]['title']+' \n '+post['entries'][z]['id'])
-                        print('entrou no else sem o bozo')    
+                        bot.sendMessage(chat_id,post['entries'][z]['title']+'---'+link[0])
                     conn.commit()
+
             link = (read.readline(),)
         read.close()
         conn.close()
         # code sleeps for 4 minutes
         time.sleep(240)
 
-TOKEN = 'TOKEN'  # get token from command-line
+TOKEN = '420896204:AAEVJamoLZA-LFfyRb3dh9dLRZWujQv8vbY'  # get token from command-line
 
 bot = telepot.Bot(TOKEN)
 
