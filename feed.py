@@ -32,8 +32,9 @@ def on_chat_message(msg):
 
             if (post['bozo'] == 1):
                 print('com bozo')
+
                 url = (link[0])
-                read = urlopen(url)
+                read = (urlopen(url),)
                 soup = BeautifulSoup(read,'html.parser')
                 #Remover tags titles e guid
                 titles = soup.find_all('title')
@@ -46,7 +47,6 @@ def on_chat_message(msg):
                 if(result):
                     cont = 0
                     while (rodar):
-                        print(rodar)
                         #atribui o guid(links da pagina) para a variavel i
                         for i in links:
                             #i.text compara os links que estao no banco
@@ -116,7 +116,7 @@ def on_chat_message(msg):
         # code sleeps for 4 minutes
         time.sleep(240)
 
-TOKEN = '420896204:AAEVJamoLZA-LFfyRb3dh9dLRZWujQv8vbY'  # get token from command-line
+TOKEN = 'TOKEN'  # get token from command-line
 
 bot = telepot.Bot(TOKEN)
 
