@@ -1,4 +1,6 @@
 import telepot
+import sys
+import os
 import sqlite3
 import feedparser
 import time
@@ -9,7 +11,6 @@ from urllib.request import urlopen
 
 def on_chat_message(msg):
     while 1:
-
         conn = sqlite3.connect('feedero.db')
 
         text, chat_type, chat_id = telepot.glance(msg)
@@ -106,7 +107,7 @@ def on_chat_message(msg):
         # code sleeps for 4 minutes
         time.sleep(240)
 
-TOKEN = 'TOKEN'  # get token from command-line
+TOKEN = os.environ.get('BOT_TOKEN') 
 
 bot = telepot.Bot(TOKEN)
 
