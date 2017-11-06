@@ -1,5 +1,8 @@
-import sys
+
+from telegram.ext import Updater, CommandHandler
+import logging
 import os
+import sys
 import telepot
 import sqlite3
 import feedparser
@@ -9,16 +12,21 @@ from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from urllib.request import urlopen
 
-def on_chat_message(msg):
-    while 1:
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+
+def alarm(bot, job):
+    try:                                
         conn = sqlite3.connect('feedero.db')
-        print('wut')
         
         read = open('lista.txt', 'r+')
         link = (read.readline(),)
         cont = 0
         while (link[0]):
-            print('wut2')
             print ('Iniciando codigo')
             sql = 'SELECT post_id FROM feedero WHERE feed_link = (?)'
             rodar = 1
@@ -31,7 +39,6 @@ def on_chat_message(msg):
             # verifica se o feed tem erro de bozo
             if (post['bozo'] == 1):
                 print('com bozo')
-                debuga = 1
                 url = (link[0])
                 ler = urlopen(url)
                 soup = BeautifulSoup(ler,'html.parser')
@@ -50,7 +57,7 @@ def on_chat_message(msg):
 
                             for z in range(cont):
                                 if(titles[z].text != 'Fundação Cultural Palmares'):
-                                    bot.sendMessage(chat_id,''+titles[z].text+'\n'+posts[z].text)
+                                    bot.sendMessage(job.context,''+titles[z].text+'\n'+posts[z].text)
                                    
                             sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                             curs = conn.cursor()
@@ -69,7 +76,7 @@ def on_chat_message(msg):
                     result = curs.execute(sql,params)
                     for z in range(len(posts)):
                         if(titles[z].text != 'Fundação Cultural Palmares'):
-                            bot.sendMessage(chat_id,''+titles[z].text+'\n'+posts[0].text)
+                            bot.sendMessage(job.context,""+titles[z].text+'\n'+posts[z].text)
                     conn.commit()                       
             else:
                 if(result):
@@ -78,7 +85,7 @@ def on_chat_message(msg):
                         for i in range(len(post['entries'])):
                             if (result[0] == (post['entries'][i]['id'])):
                                 for z in range(cont):
-                                    bot.sendMessage(chat_id,post['entries'][z]['title']+'\n'+link[0])
+                                    bot.sendMessage(job.context,""+post['entries'][z]['title']+'\n'+link[0])
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
                                 params = (post['entries'][0]['id'],link[0])
@@ -96,22 +103,62 @@ def on_chat_message(msg):
                     params = (post['entries'][0]['id'],link[0])
                     result = curs.execute(sql,params)
                     for z in range(len(post['entries'])):
-                        bot.sendMessage(chat_id,post['entries'][z]['title']+'---'+link[0])
+                        bot.sendMessage(job.context,""+post['entries'][z]['title']+'\n'+link[0])
                     conn.commit()
 
             link = (read.readline(),)
         read.close()
         conn.close()
-        # code sleeps for 4 minutes
-        time.sleep(240)
 
-TOKEN = os.environ.get('BOT_TOKEN') 
+    except(TimedOut, ReadTimeoutError):
+        bot.sendMessage(job.context, "Erros-------------------------------------------------------")
 
-bot = telepot.Bot(TOKEN)
 
-MessageLoop(bot, {'chat': on_chat_message}).run_as_thread()
+def set_timer(bot, update, args, job_queue, chat_data):
+    
+    chat_id = update.message.chat_id
+    try:
+        
+        due = 5
 
-print('Listening ...')
+        
+        job = job_queue.run_repeating(alarm, due, context=chat_id)
+        chat_data['job'] = job
 
-while 1:
-    time.sleep(10)
+        update.message.reply_text('Serviço reiniciado com sucesso! \n Continuando execução...')
+
+    except (IndexError, ValueError):
+        update.message.reply_text('Usage: /set <seconds>')
+
+def error(bot, update, error):
+    
+    logger.warning('Update "%s" caused error "%s"', update, error)
+
+
+def main():
+    
+    updater = Updater(os.environ.get('BOT_TOKEN'))
+
+    
+    dp = updater.dispatcher
+
+    
+    dp.add_handler(CommandHandler("start", set_timer,
+                                  pass_args=True,
+                                  pass_job_queue=True,
+                                  pass_chat_data=True))
+
+    # log all errors
+    dp.add_error_handler(error)
+
+    # Start the Bot
+    updater.start_polling()
+
+    # Block until you press Ctrl-C or the process receives SIGINT, SIGTERM or
+    # SIGABRT. This should be used most of the time, since start_polling() is
+    # non-blocking and will stop the bot gracefully.
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()

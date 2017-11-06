@@ -1,9 +1,7 @@
 version: '2'
 services:
-  salic_bot:
-    container_name: feed_bot
+  feed_bot:
+    container_name: feed_bot_teste
     build: .
-    volumes:
-      - .:/source
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
