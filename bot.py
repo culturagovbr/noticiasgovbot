@@ -61,7 +61,7 @@ def alarm(bot, job):
 
                             for z in range(cont):
                                 if(titles[z].text != 'Fundação Cultural Palmares'):
-                                    bot.sendMessage(chat_id,''+titles[z].text+'\n'+posts[z].text)
+                                    bot.sendMessage(chat_id,''+titles[z].text+'\n'+posts[z].text, timeout=300)
 
                             sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                             curs = conn.cursor()
@@ -80,7 +80,7 @@ def alarm(bot, job):
                     result = curs.execute(sql,params)
                     for z in range(len(posts)):
                         if(titles[z].text != 'Fundação Cultural Palmares'):
-                            bot.sendMessage(chat_id,""+titles[z].text+'\n'+posts[z].text)
+                            bot.sendMessage(chat_id,""+titles[z].text+'\n'+posts[z].text, timeout=300)
                     conn.commit()
             else:
                 if(result):
@@ -89,7 +89,7 @@ def alarm(bot, job):
                         for i in range(len(post['entries'])):
                             if (result[0] == (post['entries'][i]['id'])):
                                 for z in range(cont):
-                                    bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['id'])
+                                    bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['id'], timeout=300)
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
                                 params = (post['entries'][0]['id'],linha[x])
@@ -119,7 +119,7 @@ def set_timer(bot, update, args, job_queue, chat_data):
     chat_id = update.message.chat_id
     try:
 
-        due = 1  #Tempo em segundos!
+        due = 240  #Tempo em segundos!
 
 
         job = job_queue.run_repeating(alarm, due, context=chat_id)
