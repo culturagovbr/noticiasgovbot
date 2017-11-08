@@ -20,34 +20,38 @@ logger = logging.getLogger(__name__)
 
 
 def alarm(bot, job):
-    try:                                
+    try:
         conn = sqlite3.connect('feedero.db')
-        
+        chat_id='@feederinhoCanal'
         read = open('lista.txt', 'r+')
-        link = (read.readline(),)
+        linha = (read.readline(),)
+        x = 0
+        while(linha[x]):
+            linha+=(read.readline(),)
+            x+=1
+        read.close()
         cont = 0
-        while (link[0]):
+        for x in range(len(linha)-1):
             print ('Iniciando codigo')
             sql = 'SELECT post_id FROM feedero WHERE feed_link = (?)'
             rodar = 1
-            print ('Link:  '+link[0])
-            post = feedparser.parse(link[0])
-            
+            post = feedparser.parse(linha[x])
+            print ('Link:'+linha[x])
             curs = conn.cursor()
-            curs.execute(sql,link)
+            curs.execute(sql,(linha[x],))
             result = curs.fetchone()
             # verifica se o feed tem erro de bozo
             if (post['bozo'] == 1):
                 print('com bozo')
-                url = (link[0])
+                url = (linha[x])
                 ler = urlopen(url)
                 soup = BeautifulSoup(ler,'html.parser')
                 #titulo da noticia
                 titles = soup.find_all('title')
-                
+
                 #link da noticia
                 posts = soup.find_all('guid')
-                
+                ler.close()
                 if(result):
                     cont = 1
                     #atribui o guid(links da pagina) para a variavel i
@@ -57,11 +61,11 @@ def alarm(bot, job):
 
                             for z in range(cont):
                                 if(titles[z].text != 'Fundação Cultural Palmares'):
-                                    bot.sendMessage(job.context,''+titles[z].text+'\n'+posts[z].text)
-                                   
+                                    bot.sendMessage(chat_id,''+titles[z].text+'\n'+posts[z].text)
+
                             sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                             curs = conn.cursor()
-                            params = (posts[0].text,link[0])
+                            params = (posts[0].text,linha[x])
                             curs.execute(sql,params)
                             conn.commit()
 
@@ -72,12 +76,12 @@ def alarm(bot, job):
                     print('nao existe')
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
-                    params = (posts[0].text,link[0])
+                    params = (posts[0].text,linha[x])
                     result = curs.execute(sql,params)
                     for z in range(len(posts)):
                         if(titles[z].text != 'Fundação Cultural Palmares'):
-                            bot.sendMessage(job.context,""+titles[z].text+'\n'+posts[z].text)
-                    conn.commit()                       
+                            bot.sendMessage(chat_id,""+titles[z].text+'\n'+posts[z].text)
+                    conn.commit()
             else:
                 if(result):
                     cont = 0
@@ -85,43 +89,39 @@ def alarm(bot, job):
                         for i in range(len(post['entries'])):
                             if (result[0] == (post['entries'][i]['id'])):
                                 for z in range(cont):
-                                    bot.sendMessage(job.context,""+post['entries'][z]['title']+'\n'+link[0])
+                                    bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['id'])
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
-                                params = (post['entries'][0]['id'],link[0])
+                                params = (post['entries'][0]['id'],linha[x])
                                 curs.execute(sql,params)
                                 conn.commit()
-                    
                                 rodar = 0
                                 break
                             else:
-                                cont+=1                          
+                                cont+=1
                 else:
                     print('não existe')
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
-                    params = (post['entries'][0]['id'],link[0])
+                    params = (post['entries'][0]['id'],linha[x])
                     result = curs.execute(sql,params)
                     for z in range(len(post['entries'])):
-                        bot.sendMessage(job.context,""+post['entries'][z]['title']+'\n'+link[0])
+                        bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['id'], timeout=300)
                     conn.commit()
-
-            link = (read.readline(),)
-        read.close()
         conn.close()
 
-    except(TimedOut, ReadTimeoutError):
+    except():
         bot.sendMessage(job.context, "Erros-------------------------------------------------------")
 
 
 def set_timer(bot, update, args, job_queue, chat_data):
-    
+
     chat_id = update.message.chat_id
     try:
-        
-        due = 5
 
-        
+        due = 1  #Tempo em segundos!
+
+
         job = job_queue.run_repeating(alarm, due, context=chat_id)
         chat_data['job'] = job
 
@@ -131,18 +131,18 @@ def set_timer(bot, update, args, job_queue, chat_data):
         update.message.reply_text('Usage: /set <seconds>')
 
 def error(bot, update, error):
-    
+
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
 def main():
-    
+
     updater = Updater(os.environ.get('BOT_TOKEN'))
 
-    
+
     dp = updater.dispatcher
 
-    
+
     dp.add_handler(CommandHandler("start", set_timer,
                                   pass_args=True,
                                   pass_job_queue=True,
@@ -152,7 +152,7 @@ def main():
     dp.add_error_handler(error)
 
     # Start the Bot
-    updater.start_polling()
+    updater.start_polling(timeout=8220)
 
     # Block until you press Ctrl-C or the process receives SIGINT, SIGTERM or
     # SIGABRT. This should be used most of the time, since start_polling() is
