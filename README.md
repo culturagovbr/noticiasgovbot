@@ -1,5 +1,5 @@
 # FeederinhoBot
-O FeederinhoBot é um Bot para o telegram que permitirá você receber seus Feeds RSS favoritos direto no seu celular. Basta adicionar os links ao ```lista.txt``` e rodar seguindo as instruçes abaixo!
+O FeederinhoBot é um Bot para o telegram que permitirá você receber seus Feeds RSS favoritos direto no seu celular. Basta adicionar os links ao ```lista.txt``` e rodar seguindo as instruções abaixo!
 
 ## Requisitos
 * Docker-Compose*
