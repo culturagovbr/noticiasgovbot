@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 def alarm(bot, job):
     try:
         conn = sqlite3.connect('feedero.db')
-        chat_id = "@noticiasGovCanal"
+        chat_id = "@NoticiasGovCanal"
         read = open('lista.txt', 'r+')
         linha = (read.readline(),)
         x = 0
@@ -119,7 +119,7 @@ def set_timer(bot, update, args, job_queue, chat_data):
     chat_id = update.message.chat_id
     try:
 
-        due = 240  #Tempo em segundos!
+        due = 5  #Tempo em segundos!
 
 
         job = job_queue.run_repeating(alarm, due, context=chat_id)
