@@ -55,6 +55,8 @@ def alarm(bot, job):
                 var = soup.find_all('link')
                 print (posts)
                 print (var)
+                #link da noticia           
+                posts = soup.find_all('guid')
                 ler.close()
                 if(result):
                     cont = 1
@@ -125,7 +127,6 @@ def set_timer(bot, update, args, job_queue, chat_data):
     try:
 
         due = 250  #Tempo em segundos!
-
 
         job = job_queue.run_repeating(alarm, due, context=chat_id)
         chat_data['job'] = job
