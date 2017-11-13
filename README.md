@@ -1,14 +1,26 @@
 # FeederinhoBot
-O FeederinhoBot é um Bot do telegram feito em Python ao qual é fornecido um Arquivo com links RSS (lista.txt) e posts versionados via SQLite3.
+O FeederinhoBot é um Bot para o telegram que permitirá você receber seus Feeds RSS favoritos direto no seu celular. Basta adicionar os links ao ```lista.txt``` e rodar seguindo as instruções abaixo!
 
 ## Requisitos
-
+* Docker-Compose*
 * Python3
 * PIP
 * python3-virtualenv
 * SQLite3
 
-## Passos da Instalação para Debian/Ubuntu
+## Instalação Via Docker
+1. Instale o Docker-Compose [Aqui](https://docs.docker.com/compose/install/)
+
+2. Clone o repositório do projeto
+    ```
+    git clone https://github.com/culturagovbr/FeederinhoBot.git feedero
+
+    ```
+3. Inicie o Docker
+    ```
+    docker-compose up
+    ```
+## Instalação Pelo Terminal
 
 1. Instale o PIP que é o instalador de pacotes do python3
 
@@ -35,7 +47,7 @@ O arquivo pode ser baixado de forma direta e rápida utilizando o comando wget -
      cd  /caminho/para/o/ambiente/virtual
 
      ```
-4. Clone o repositório do projeto do github
+4. Clone o repositório do projeto
     ```
     git clone https://github.com/culturagovbr/FeederinhoBot.git feedero
 
