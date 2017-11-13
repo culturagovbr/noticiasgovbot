@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 def alarm(bot, job):
     try:
         conn = sqlite3.connect('feedero.db')
-        chat_id='@feederinhoCanal'
+        chat_id = "@noticiasGovCanal"
         read = open('lista.txt', 'r+')
         linha = (read.readline(),)
         x = 0
@@ -50,7 +50,11 @@ def alarm(bot, job):
                 titles = soup.find_all('title')
 
                 #link da noticia
+                
                 posts = soup.find_all('guid')
+                var = soup.find_all('link')
+                print (posts)
+                print (var)
                 ler.close()
                 if(result):
                     cont = 1
@@ -58,9 +62,10 @@ def alarm(bot, job):
                     for i in posts:
                         #i.text compara os links que estao no banco
                         if(result[0] == i.text):
-
+                            print (posts[0].text)
+                            print (linha[x])
                             for z in range(cont):
-                                if(titles[z].text != 'Fundação Cultural Palmares'):
+                                if(titles[z].text != 'Fundacao Cultural Palmares'):
                                     bot.sendMessage(chat_id,''+titles[z].text+'\n'+posts[z].text, timeout=300)
 
                             sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
@@ -79,7 +84,7 @@ def alarm(bot, job):
                     params = (posts[0].text,linha[x])
                     result = curs.execute(sql,params)
                     for z in range(len(posts)):
-                        if(titles[z].text != 'Fundação Cultural Palmares'):
+                        if(titles[z].text != 'Fundacao Cultural Palmares'):
                             bot.sendMessage(chat_id,""+titles[z].text+'\n'+posts[z].text, timeout=300)
                     conn.commit()
             else:
@@ -87,12 +92,12 @@ def alarm(bot, job):
                     cont = 0
                     while (rodar):
                         for i in range(len(post['entries'])):
-                            if (result[0] == (post['entries'][i]['id'])):
+                            if (result[0] == (post['entries'][i]['links'][0]['href'])):
                                 for z in range(cont):
-                                    bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['id'], timeout=300)
+                                    bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['links'][0]['href'], timeout=300)
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
-                                params = (post['entries'][0]['id'],linha[x])
+                                params = (post['entries'][0]['links'][0]['href'],linha[x])
                                 curs.execute(sql,params)
                                 conn.commit()
                                 rodar = 0
@@ -100,13 +105,13 @@ def alarm(bot, job):
                             else:
                                 cont+=1
                 else:
-                    print('não existe')
+                    print('nao existe')
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
-                    params = (post['entries'][0]['id'],linha[x])
+                    params = (post['entries'][0]['links'][0]['href'],linha[x])
                     result = curs.execute(sql,params)
                     for z in range(len(post['entries'])):
-                        bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['id'], timeout=300)
+                        bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['links'][0]['href'], timeout=300)
                     conn.commit()
         conn.close()
 
@@ -119,13 +124,13 @@ def set_timer(bot, update, args, job_queue, chat_data):
     chat_id = update.message.chat_id
     try:
 
-        due = 240  #Tempo em segundos!
+        due = 250  #Tempo em segundos!
 
 
         job = job_queue.run_repeating(alarm, due, context=chat_id)
         chat_data['job'] = job
 
-        update.message.reply_text('Serviço reiniciado com sucesso! \n Continuando execução...')
+        update.message.reply_text('Servico reiniciado com sucesso! \n Continuando execucao...')
 
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /set <seconds>')
