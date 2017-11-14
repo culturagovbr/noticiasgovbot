@@ -1,7 +1,7 @@
 version: '2'
 services:
   gov_bot:
-    container_name: feed_bot_teste
+    container_name: gov_bot 
     build: .
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
