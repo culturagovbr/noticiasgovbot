@@ -4,4 +4,4 @@ services:
     container_name: gov_bot 
     build: .
     environment:
-      - BOT_TOKEN=${BOT_TOKEN}
+      - GOV_TOKEN=${GOV_TOKEN}
