@@ -143,7 +143,7 @@ def error(bot, update, error):
 
 def main():
 
-    updater = Updater(os.environ.get('FEED_TOKEN'))
+    updater = Updater(os.environ.get('GOV_TOKEN'))
 
 
     dp = updater.dispatcher
