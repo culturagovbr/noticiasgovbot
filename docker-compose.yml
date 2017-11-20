@@ -1,6 +1,8 @@
 version: '2'
 services:
   gov_bot:
+    volumes:
+     - /home/bot/noticiasgovbot/:/source
     container_name: gov_bot 
     build: .
     environment:
