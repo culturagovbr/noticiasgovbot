@@ -32,17 +32,17 @@ def alarm(bot, job):
         read.close()
         cont = 0
         for x in range(len(linha)-1):
-            print ('Iniciando codigo')
+            print ('Iniciando codigo: '+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
             sql = 'SELECT post_id FROM feedero WHERE feed_link = (?)'
             rodar = 1
             post = feedparser.parse(linha[x])
-            print ('Link:'+linha[x])
+            print ('Link:'+linha[x]+'  '+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
             curs = conn.cursor()
             curs.execute(sql,(linha[x],))
             result = curs.fetchone()
             # verifica se o feed tem erro de bozo
             if (post['bozo'] == 1):
-                print('com bozo')
+                print('com bozo'+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
                 url = (linha[x])
                 ler = urlopen(url)
                 soup = BeautifulSoup(ler,'html.parser')
@@ -64,8 +64,7 @@ def alarm(bot, job):
                     for i in posts:
                         #i.text compara os links que estao no banco
                         if(result[0] == i.text):
-                            print (posts[0].text)
-                            print (linha[x])
+
                             for z in range(cont):
                                 if(titles[z].text != 'Fundacao Cultural Palmares'):
                                     bot.sendMessage(chat_id,''+titles[z].text+'\n'+posts[z].text, timeout=300)
@@ -80,7 +79,7 @@ def alarm(bot, job):
                         else:
                             cont+=1
                 else:
-                    print('nao existe')
+                    print('nao existe'+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
                     params = (posts[0].text,linha[x])
@@ -107,7 +106,7 @@ def alarm(bot, job):
                             else:
                                 cont+=1
                 else:
-                    print('nao existe')
+                    print('nao existe'+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
                     params = (post['entries'][0]['links'][0]['href'],linha[x])
