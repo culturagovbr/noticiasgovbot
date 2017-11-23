@@ -1,4 +1,3 @@
-
 from telegram.ext import Updater, CommandHandler
 import logging
 import os
@@ -10,19 +9,32 @@ import time
 from bs4 import BeautifulSoup
 from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
-from urllib.request import urlopen
-
+from urllib.request import urlopen 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
+# def sendmsg(bot,chat_id):
+#  #envia as mensagens pro tele
+
+# def dbstuff(bot,errorC):
+#     #faz tudo que diz respeito ao banco
+
+#     conn = sqlite3.connect('feedero.db')
+
+#     if errorC:
+#         #executar se tiver erro no feed
+#     else:
+#         #executar se n tiver erro
+#     conn.close()
+#     return 0
 
 def alarm(bot, job):
     try:
         conn = sqlite3.connect('feedero.db')
-        chat_id = "@noticiasGovCanal"
+        chat_id = "@RamonCanabarro"
         read = open('lista.txt', 'r+')
         linha = (read.readline(),)
         x = 0
@@ -44,19 +56,21 @@ def alarm(bot, job):
             if (post['bozo'] == 1):
                 print('com bozo'+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
                 url = (linha[x])
-                ler = urlopen(url)
+                try:
+                    ler = urlopen(url)                    
+                except Exception as e:
+                    print ('Erro no link: ' + url +'\n'+' Erro:'+e.code+'  ' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))                     
                 soup = BeautifulSoup(ler,'html.parser')
                 #titulo da noticia
                 titles = soup.find_all('title')
 
                 #link da noticia
-                
                 posts = soup.find_all('guid')
                 var = soup.find_all('link')
+                print (titles)
                 print (posts)
                 print (var)
-                #link da noticia           
-                posts = soup.find_all('guid')
+                
                 ler.close()
                 if(result):
                     cont = 1
@@ -67,7 +81,7 @@ def alarm(bot, job):
 
                             for z in range(cont):
                                 if(titles[z].text != 'Fundacao Cultural Palmares'):
-                                    bot.sendMessage(chat_id,''+titles[z].text+'\n'+posts[z].text, timeout=300)
+                                    bot.sendMessage(job.context,''+titles[z].text+'\n'+posts[z].text, timeout=300)
 
                             sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                             curs = conn.cursor()
@@ -86,7 +100,7 @@ def alarm(bot, job):
                     result = curs.execute(sql,params)
                     for z in range(len(posts)):
                         if(titles[z].text != 'Fundacao Cultural Palmares'):
-                            bot.sendMessage(chat_id,""+titles[z].text+'\n'+posts[z].text, timeout=300)
+                            bot.sendMessage(job.context,""+titles[z].text+'\n'+posts[z].text, timeout=300)
                     conn.commit()
             else:
                 if(result):
@@ -95,7 +109,7 @@ def alarm(bot, job):
                         for i in range(len(post['entries'])):
                             if (result[0] == (post['entries'][i]['links'][0]['href'])):
                                 for z in range(cont):
-                                    bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['links'][0]['href'], timeout=300)
+                                    bot.sendMessage(job.context,""+post['entries'][z]['title']+'\n'+post['entries'][z]['links'][0]['href'], timeout=300)
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
                                 params = (post['entries'][0]['links'][0]['href'],linha[x])
@@ -112,7 +126,7 @@ def alarm(bot, job):
                     params = (post['entries'][0]['links'][0]['href'],linha[x])
                     result = curs.execute(sql,params)
                     for z in range(len(post['entries'])):
-                        bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['links'][0]['href'], timeout=300)
+                        bot.sendMessage(job.context,""+post['entries'][z]['title']+'\n'+post['entries'][z]['links'][0]['href'], timeout=300)
                     conn.commit()
         conn.close()
 
@@ -125,7 +139,7 @@ def set_timer(bot, update, args, job_queue, chat_data):
     chat_id = update.message.chat_id
     try:
 
-        due = 250  #Tempo em segundos!
+        due = 1  #Tempo em segundos!
 
         job = job_queue.run_repeating(alarm, due, context=chat_id)
         chat_data['job'] = job

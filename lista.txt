@@ -1,3 +1,5 @@
+http://www.planejamento.gov.br/noticias/ultimas-noticias/RSS
+http://www.planejamento.gov.br/noticias/RSS
 http://portal.mec.gov.br/rss-noticias
 http://www.justica.gov.br/colecao_noticias/RSS
 http://feeds.feedburner.com/Rss-Presidencia-Entrevistas?format=xml
@@ -6,7 +8,5 @@ http://www.agricultura.gov.br/Portal/ultimas-noticias/RSS
 http://www.turismo.gov.br/ultimas-noticias.feed?type=rss
 http://cidades.gov.br/ultimas-noticias?format=feed&type=rss
 http://www.previdencia.gov.br/feed/
-http://www.planejamento.gov.br/noticias/RSS
-http://www.planejamento.gov.br/noticias/ultimas-noticias/RSS
 http://www.casacivil.gov.br/central-de-conteudos/noticias/ultimas-noticias-home/RSS
 https://www.governoeletronico.gov.br/rss
