@@ -57,9 +57,11 @@ def alarm(bot, job):
                 print('com bozo'+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
                 url = (linha[x])
                 try:
-                    ler = urlopen(url)                    
+                    ler = urlopen(url)
                 except Exception as e:
-                    print ('Erro no link: ' + url +'\n'+' Erro:'+e.code+'  ' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))                     
+                    if (e.code in (502,503,504)):
+                    	print ('Erro no link: ' + url +'\n'+' Erro:'+str(e.code)+'  ' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))
+                    	x+=1
                 soup = BeautifulSoup(ler,'html.parser')
                 #titulo da noticia
                 titles = soup.find_all('title')
@@ -67,6 +69,9 @@ def alarm(bot, job):
                 #link da noticia
                 posts = soup.find_all('guid')
                 var = soup.find_all('link')
+
+                # if (titles):
+                	
                 print (titles)
                 print (posts)
                 print (var)
@@ -81,11 +86,14 @@ def alarm(bot, job):
 
                             for z in range(cont):
                                 if(titles[z].text != 'Fundacao Cultural Palmares'):
-                                    bot.sendMessage(job.context,''+titles[z].text+'\n'+posts[z].text, timeout=300)
+                                    bot.sendMessage(job.context,''+post[z].text+'\n'+posts[z].text, timeout=300)
 
                             sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                             curs = conn.cursor()
-                            params = (posts[0].text,linha[x])
+                            if titles and not posts:
+                            	params = (titles[0].text,linha[x])
+                            else:
+                                params = (posts[0].text,linha[x])
                             curs.execute(sql,params)
                             conn.commit()
 
@@ -96,6 +104,10 @@ def alarm(bot, job):
                     print('nao existe'+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
+                    if titles and not posts:
+                    	params = (titles[0].text,linha[x])
+                    else:
+                        params = (posts[0].text,linha[x])
                     params = (posts[0].text,linha[x])
                     result = curs.execute(sql,params)
                     for z in range(len(posts)):
