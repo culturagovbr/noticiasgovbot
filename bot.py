@@ -9,7 +9,7 @@ import time
 from bs4 import BeautifulSoup
 from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
-from urllib.request import urlopen 
+from urllib.request import urlopen
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -59,9 +59,9 @@ def alarm(bot, job):
                 try:
                     ler = urlopen(url)
                 except Exception as e:
-                    if (e.code in (502,503,504)):
-                    	print ('Erro no link: ' + url +'\n'+' Erro:'+str(e.code)+'  ' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))
-                    	x+=1
+                   print ('Erro no link: ' + url +'\n'+' Erro:'+str(e.code)+'  ' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))
+                   x+=1
+                   break
                 soup = BeautifulSoup(ler,'html.parser')
                 #titulo da noticia
                 titles = soup.find_all('title')
@@ -71,11 +71,11 @@ def alarm(bot, job):
                 var = soup.find_all('link')
 
                 # if (titles):
-                	
+
                 print (titles)
                 print (posts)
                 print (var)
-                
+
                 ler.close()
                 if(result):
                     cont = 1
@@ -83,17 +83,16 @@ def alarm(bot, job):
                     for i in posts:
                         #i.text compara os links que estao no banco
                         if(result[0] == i.text):
-
+			params = (titles[0].text,linha[x])
                             for z in range(cont):
-                                if(titles[z].text != 'Fundacao Cultural Palmares'):
-                                    bot.sendMessage(job.context,''+post[z].text+'\n'+posts[z].text, timeout=300)
+                                if(titles[z].text != 'Notícias'):
+                                    bot.sendMessage(job.context,''+titles[z].text+'\n'+linha[x], timeout=300)
+
 
                             sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                             curs = conn.cursor()
-                            if titles and not posts:
-                            	params = (titles[0].text,linha[x])
-                            else:
-                                params = (posts[0].text,linha[x])
+			    if(titles[0].text == 'Notícias'):
+				params = (titles[1].text,linha[x])
                             curs.execute(sql,params)
                             conn.commit()
 
@@ -104,15 +103,13 @@ def alarm(bot, job):
                     print('nao existe'+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
-                    if titles and not posts:
-                    	params = (titles[0].text,linha[x])
-                    else:
-                        params = (posts[0].text,linha[x])
-                    params = (posts[0].text,linha[x])
+		    params = (titles[0].text,linha[x])
+		    if(titles[0].text == 'Notícias'):
+		        params = (titles[1].text,linha[x])
                     result = curs.execute(sql,params)
-                    for z in range(len(posts)):
-                        if(titles[z].text != 'Fundacao Cultural Palmares'):
-                            bot.sendMessage(job.context,""+titles[z].text+'\n'+posts[z].text, timeout=300)
+                    for z in range(len(titles)):
+                        if(titles[z].text != 'Notícias'):
+                            bot.sendMessage(job.context,""+titles[z].text+'\n'+linha[x], timeout=300)
                     conn.commit()
             else:
                 if(result):
@@ -151,7 +148,7 @@ def set_timer(bot, update, args, job_queue, chat_data):
     chat_id = update.message.chat_id
     try:
 
-        due = 1  #Tempo em segundos!
+        due = 240  #Tempo em segundos!
 
         job = job_queue.run_repeating(alarm, due, context=chat_id)
         chat_data['job'] = job
