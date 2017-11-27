@@ -83,7 +83,7 @@ def alarm(bot, job):
                     for i in posts:
                         #i.text compara os links que estao no banco
                         if(result[0] == i.text):
-			params = (titles[0].text,linha[x])
+                            params = (titles[0].text,linha[x])
                             for z in range(cont):
                                 if(titles[z].text != 'Notícias'):
                                     bot.sendMessage(job.context,''+titles[z].text+'\n'+linha[x], timeout=300)
@@ -91,11 +91,10 @@ def alarm(bot, job):
 
                             sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                             curs = conn.cursor()
-			    if(titles[0].text == 'Notícias'):
-				params = (titles[1].text,linha[x])
+                            if(titles[0].text == 'Notícias'):
+                                params = (titles[1].text,linha[x])
                             curs.execute(sql,params)
                             conn.commit()
-
                             break
                         else:
                             cont+=1
@@ -103,14 +102,14 @@ def alarm(bot, job):
                     print('nao existe'+str(time.strftime("%Y-%m-%d %H:%M:%S" )))
                     sql = 'INSERT INTO feedero VALUES (?,?)'
                     curs = conn.cursor()
-		    params = (titles[0].text,linha[x])
-		    if(titles[0].text == 'Notícias'):
-		        params = (titles[1].text,linha[x])
-                    result = curs.execute(sql,params)
-                    for z in range(len(titles)):
-                        if(titles[z].text != 'Notícias'):
-                            bot.sendMessage(job.context,""+titles[z].text+'\n'+linha[x], timeout=300)
-                    conn.commit()
+                params = (titles[0].text,linha[x])
+                if(titles[0].text == 'Notícias'):
+		                  params = (titles[1].text,linha[x])
+                result = curs.execute(sql,params)
+                for z in range(len(titles)):
+                    if(titles[z].text != 'Notícias'):
+                        bot.sendMessage(job.context,""+titles[z].text+'\n'+linha[x], timeout=300)
+                conn.commit()
             else:
                 if(result):
                     cont = 0
