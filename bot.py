@@ -124,8 +124,8 @@ def alarm(bot, job):
                     conn.commit()
         conn.close()
 
-    except requests.exceptions.ConnectionError as e:
-        print ('Erro no link: ' + linha[x] +'\n'+' Erro:'+str(e)+'  ' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))
+    except Exception as e:
+        print ('Erro' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))
         print(e)
 
 
