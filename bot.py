@@ -46,6 +46,7 @@ def alarm(bot, job):
                     ler = urlopen(url)
                 except Exception as e:
                    print ('Erro no link: ' + url +'\n'+' Erro:'+str(e)+'  ' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))
+                   conn.close()
                    x+=1
                    break
                 soup = BeautifulSoup(ler,'html.parser')
@@ -92,7 +93,7 @@ def alarm(bot, job):
                 if(titles[0].text == 'Notícias'):
                           params = (titles[1].text,linha[x])
                 result = curs.execute(sql,params)
-                for z in range(len(titles)):
+                for z in reversed(range(len(titles))):
                     if(titles[z].text != 'Notícias'):
                         bot.sendMessage(chat_id,""+titles[z].text+'\n'+linha[x], timeout=300)
                 conn.commit()
@@ -102,7 +103,7 @@ def alarm(bot, job):
                     if(rodar):
                         for i in range(len(post['entries'])):
                             if (result[0] == (post['entries'][i]['links'][0]['href'])):
-                                for z in range(cont):
+                                for z in reversed(range(cont)):
                                     bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['links'][0]['href'], timeout=300)
                                 sql = '''UPDATE feedero SET post_id = ? WHERE feed_link = ?'''
                                 curs = conn.cursor()
@@ -119,22 +120,23 @@ def alarm(bot, job):
                     curs = conn.cursor()
                     params = (post['entries'][0]['links'][0]['href'],linha[x])
                     result = curs.execute(sql,params)
-                    for z in range(len(post['entries'])):
+                    for z in reversed(range(len(post['entries']))):
                         bot.sendMessage(chat_id,""+post['entries'][z]['title']+'\n'+post['entries'][z]['links'][0]['href'], timeout=300)
                     conn.commit()
         conn.close()
 
     except Exception as e:
         print ('Erro' +str(time.strftime("%Y-%m-%d %H:%M:%S" )))
+        conn.close()
         print(e)
-
+        pass
 
 def set_timer(bot, update, args, job_queue, chat_data):
 
     chat_id = update.message.chat_id
     try:
 
-        due = 10  #Tempo em segundos!
+        due = 240  #Tempo em segundos!
 
         job = job_queue.run_repeating(alarm, due, context=chat_id)
         chat_data['job'] = job
