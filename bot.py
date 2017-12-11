@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 def alarm(bot, job):
     try:
         conn = sqlite3.connect('feedero.db')
-        chat_id = "@FeedReaderCanal"
+        chat_id = "@noticiasGovCanal"
         read = open('lista.txt', 'r+')
         linha = (read.readline(),)
         x = 0
