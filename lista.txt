@@ -1,6 +1,5 @@
 http://www.planejamento.gov.br/noticias/ultimas-noticias/RSS
 http://www.planejamento.gov.br/noticias/RSS
-http://portal.mec.gov.br/rss-noticias
 http://www.justica.gov.br/colecao_noticias/RSS
 http://feeds.feedburner.com/Rss-Presidencia-Entrevistas?format=xml
 http://feeds.feedburner.com/Rss-Presidencia-Discursos?format=xml
